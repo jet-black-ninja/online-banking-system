@@ -1,8 +1,8 @@
-#ifndef SACHIN_H
-#define SACHIN_H
+#ifndef SUPPORT_H
+#define SUPPORT_H
 
 #include <iostream>
-class Sachin{
+class Support{
     public:
     void delay() const;
     void delay(const long int) const;
@@ -13,4 +13,4 @@ class Sachin{
     void transText(const std:: string, int) const;  
 };
 
-#endif //SACHIN_h
+#endif //SUPPORT_h
