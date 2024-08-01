@@ -2,7 +2,6 @@
 #include <sstream>
 #include <cstring>
 #include "headers/timestamp.h"
-#include "timestamp.h"
 
 TimeStamp::TimeStamp(const TimeStamp & other){
     date = other.date;

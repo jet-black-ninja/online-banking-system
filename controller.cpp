@@ -6,10 +6,10 @@
 #include<iostream>
 #include<fstream>
 #include<vector>
-#include<clib>
+#include<cstdlib>
 #include<algorithm>
 
-using namespace ;
+using namespace std;
 void Controller::showBanner(){
     system("clear");
     Support support;
@@ -27,7 +27,7 @@ void Controller::showMenu(){
     cout<<"5. Exit"<< endl;
 
     cout<< endl << endl;
-    cout<<"\t Enter choice :"<<endl;
+    cout<<"\t Enter choice :";
     cin>>ch;
     switch(ch){
         case 1:
@@ -699,6 +699,49 @@ void Controller::withdraw(){
     cout<<"Transaction could not be completed. Please contact the nearest Branch."<<endl;
 }
 
+void Controller::changeCustomerPassword(const int SESSION){
+    Support support;
+    vector<Customer> custVector;
+    Customer cust;
+    fstream fin("customer.txt", ios::binary | ios:: in);
+    while(fin.read((char*)&cust, sizeof(Customer))){
+        custVector.push_back(cust);
+    }
+    fin.close();
+    char prevPass[30], newPass[30];
+    support.drawLine(100);
+    cout<<"Change Password"<<endl;
+    support.drawLine(100);
+    cout<<"Enter Previous Password";
+    cin.ignore();
+    cin.getline(prevPass,30);
+    cout<<"Enter New Password";
+    cin.getline(newPass, 30);
+    bool SUCCESS = false;
+    for(vector<Customer>::iterator itr=custVector.begin();
+    itr!=custVector.end();++itr)
+    {
+        if((itr->getID()==SESSION) && !strcmp(itr->getPass(),prevPass))
+        {
+            itr->setPass(newPass);
+            SUCCESS=true;
+            break;
+        }
+    }
+    if(SUCCESS)
+        cout<<"Successfully changed your password. Kindly dont share your password with anyone else."<<endl;
+    else{ 
+        cout<<"Could not process your request. Please visit the nearest branch."<<endl;
+        cout<<"Possibly, you have entered previous password incorrectly"<<endl;
+    }
+    //WRITING CUSTVECTOR TO THE CUSTOMER.TXT
+    fstream fout("customer.txt",ios::binary|ios::out|ios::trunc);
+    for(int i=0;i<custVector.size();i++)
+    {
+        fout.write((char*)&custVector.at(i),sizeof(Customer));
+    }
+    fout.close();
+}
 
 
 //SORTING ALGORITHMS

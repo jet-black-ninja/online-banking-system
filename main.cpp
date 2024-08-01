@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <cstdlib>
-#include "headers/utility.h"
+#include "utility.h"
 using namespace std;
 
 int main(int argc, char* argv[]){
