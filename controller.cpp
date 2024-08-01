@@ -6,10 +6,10 @@
 #include<iostream>
 #include<fstream>
 #include<vector>
-#include<cstdlib>
+#include<clib>
 #include<algorithm>
 
-using namespace std;
+using namespace ;
 void Controller::showBanner(){
     system("clear");
     Support support;
@@ -104,12 +104,12 @@ void Controller::showCustomerPortal(const int SESSION){
             custVector.push_back(customer);
         }
 
-        std::cout<<"1. View Balance"<<std::endl;
-        std::cout<<"2. View Transactions"<<std::endl;
-        std::cout<<"3. Change Password"<<std::endl;
-        std::cout<<"4. Logout to Main Menu"<<std::endl;
+        cout<<"1. View Balance"<<endl;
+        cout<<"2. View Transactions"<<endl;
+        cout<<"3. Change Password"<<endl;
+        cout<<"4. Logout to Main Menu"<<endl;
         int ch;
-        std::cin>>ch;
+        cin>>ch;
 
         switch(ch){
             case 1:
@@ -273,7 +273,7 @@ void Controller::showCredits(){
     Support support;
     system("clear");
     support.drawLine(100);
-    cout<<"\t\t \e[3mBank Management System\e[0m"<<std::endl;
+    cout<<"\t\t \e[3mBank Management System\e[0m"<<endl;
     support.drawLine(100);
     cout<<endl<<"\t Created by Sachin Kumar Singh <sachinkmrsin@gmail.com>"<<endl;
     support.drawLine(100);
@@ -386,4 +386,344 @@ void Controller::modifyCustomer(){
     }
 }
 
+void Controller::displayCustomers(){
+    Support support;
+    vector<Customer> custVector;
+    Customer cust;
+    fstream fin("customer.txt",ios::binary| ios::in);
+    while(fin.read((char*)&cust , sizeof(Customer))){
+        custVector.push_back(cust);
+    }
+    fin.close();
+    support.drawLine(100);
+    cout<<"ID\tNAME\tADDRESS\tPHONE\t\tDOB\tPASSWORD\tBALANCE"<<endl;
+    support.drawLine(100);
+    for(vector<Customer>::iterator itr= custVector.begin() ; itr!=custVector.end() ; itr++){
+        cout<<itr->getID()<<"\t"<<itr->getName()<<"\t"<<itr->getAddress()<<"\t"<<itr->getPhone()<<"\t"<<(itr->getDob()).toString()<<"\t"<<itr->getPass()<<"\t"<<itr->getBalance()<<endl;
+    }
+    support.drawLine(100);
+    cout<<endl;
+}
 
+void Controller::deleteCustomer(){
+    Support support;
+    vector<Customer> custVector;
+    Customer cust;
+    fstream fin("customer.txt",ios::binary|ios::in);
+    while(fin.read((char*)&cust, sizeof(Customer))){
+        custVector.push_back(cust);
+    }
+    fin.close();
+    int id ;
+    cout<<"Enter ID of customer to delete";
+    cin>>id;
+    for(int i = 0;i<custVector.size(); i++){
+        if(custVector[i].getID() == id){
+            custVector.erase(custVector.begin()+i);
+        }
+    }
+    //truncating the cust vector to customer.txt
+    fstream fout("customer.txt",ios::binary|ios::in | ios::trunc);
+    for(int i = 0; i<custVector.size(); i++){
+        fout.write((char*)&custVector[i],sizeof(Customer));
+    }
+    fout.close();
+}
+
+void Controller::displayCustomersBy(){
+    Support support;
+    vector<Customer>custVector;
+    Customer cust;
+    fstream fin("customer.txt",ios::binary | ios::in);
+    while(fin.read((char*)&cust, sizeof(Customer))){
+        custVector.push_back(cust);
+    }
+    fin.close();
+    support.drawLine(100);
+    int ch;
+    cout<<"1. Sort by ID"<<endl;
+    cout<<"2. Sort by Name"<<endl;
+    cout<<"3. Sort by Date of Birth"<<endl;
+    cout<<"4. Sort by Balance"<<endl;
+    cin>>ch;
+    switch(ch){
+        case 1:
+        sort(custVector.begin(), custVector.end(), sortCustomerById);
+        break;
+        case 2:
+        sort(custVector.begin(), custVector.end(), sortCustomerByName);
+        break;
+        case 3:
+        sort(custVector.begin(), custVector.end(), sortCustomerByDob);
+        break;
+        case 4:
+        sort(custVector.begin(), custVector.end(), sortCustomerByBalance);
+        break;
+        default:
+        cout<<"Invalid Choice entered. Try again...";
+    }
+    cout<<"ID\tNAME\tADDRESS\tPHONE\t\tDOB\tPASSWORD\tBALANCE"<<endl;
+    for(vector<Customer>::iterator itr= custVector.begin(); itr!=custVector.end() ; itr++){
+        cout<<itr->getID()<<"\t"<<itr->getName()<<"\t"<<itr->getAddress()<<"\t"
+        <<itr->getPhone()<<"\t"<<(itr->getDob()).toString()<<"\t"<<itr->getPass()<<
+        "\t"<<itr->getBalance()<<endl;
+    }
+    support.drawLine(100);
+    cout<<endl;
+
+}
+
+void Controller:: addEmployee(){
+    vector<Employee> empVector;
+    Employee employee;
+    fstream fin("employee.txt",ios::binary | ios::in);
+    while(fin.read((char*)&employee, sizeof(Employee))){
+        empVector.push_back(employee);
+    }
+    fin.close();
+    int id; 
+    cout<<"Enter Employee ID : ";
+    cin>> id;
+    bool flag = true;
+    for(vector<Employee>::iterator itr = empVector.begin(); itr!= empVector.end() ; itr++){
+        if(itr->getID() == id){
+            flag = false;
+            break;
+        }
+    }
+
+    if(flag){
+        char name[30],address[30],pass[30];
+        long int phone;
+        TimeStamp dob;
+        float salary;
+        cout<<"Enter Employee Name: "<<endl;
+        cin.ignore();
+        cin.getline(name,30);
+        cout<<"Enter address "<<endl;
+        cin.getline(address,30);
+        cout<<"Enter phone "<<endl;
+        cin>>phone;
+        cout<<"Enter Date of Birth (DD MM YYYY) [SEPARATED BY SPACES] ";
+        int dd,mm,yy;
+        cin>>dd>>mm>>yy;
+        dob.set(dd,mm,yy);
+        cout<<"Enter Password ";
+        cin.ignore();
+        cin.getline(pass,30);
+        cout<<"Enter Salary ";
+        cin>>salary;
+        Employee emp(id,name,address,phone,dob,pass,salary);
+        fstream fout("employee.txt",ios::binary | ios::out|ios::app);
+        fout.write((char*)&emp,sizeof(Employee));
+        fout.close();
+    }else {
+        cout<< "Employee ID already in use, try another ID."<<endl;
+    }
+}
+
+void Controller::modifyEmployee(){
+    Support support ; 
+    vector<Employee> empVector;
+    Employee emp;
+    fstream fin("employee.txt",ios::binary | ios::in );
+    while(fin.read((char*)&emp, sizeof(Employee))){
+       empVector.push_back(emp);
+    }
+    displayEmployees();
+    int id;
+    cout<<"Enter Id of Employee to Modify : ";
+    cin>> id;
+    bool flag = true;
+    int count = 0;
+    for(vector<Employee>::iterator itr = empVector.begin(); itr!=empVector.end(); itr++ , count++){
+        if(itr->getID()==id){
+            flag =false;
+            break;
+        }
+    }
+
+    if(flag){
+        char name[30],address[30],pass[30];
+        long int phone;
+        TimeStamp dob;
+        float salary;
+        cout<<"Enter Employee Name: "<<endl;
+        cin.ignore();
+        cin.getline(name,30);
+        cout<<"Enter address "<<endl;
+        cin.getline(address,30);
+        cout<<"Enter phone "<<endl;
+        cin>>phone;
+        cout<<"Enter Date of Birth (DD MM YYYY) [SEPARATED BY SPACES] ";
+        int dd,mm,yy;
+        cin>>dd>>mm>>yy;
+        dob.set(dd,mm,yy);
+        cout<<"Enter Password ";
+        cin.ignore();
+        cin.getline(pass,30);
+        cout<<"Enter Salary ";
+        cin>>salary;
+        Employee emp(id,name,address,phone,dob,pass,salary);
+        fstream fout("employee.txt",ios::binary|ios::out|ios::app);
+        fout.write((char*)&emp,sizeof(Employee));
+        fout.close();
+    } else {
+        cout<<"Employee ID specified does not exist in data base, try again.";
+    }
+}
+
+void Controller::displayEmployees(){
+    Support support; 
+    vector<Employee> empVector;
+    Employee emp;
+    fstream fin("employee.txt",ios::binary | ios::in);
+    while(fin.read((char*)&emp,sizeof(Employee)))
+    {
+        empVector.push_back(emp);
+    }
+    fin.close();
+    support.drawLine(100);
+    cout<<"ID\tNAME\tADDRESS\tPHONE\t\tDOB\tPASSWORD\tSALARY"<<endl;
+    for(vector<Employee>::iterator itr=empVector.begin(); itr!=empVector.end() ; ++itr)
+    {
+        cout<<itr->getID()<<"\t"<<itr->getName()<<"\t"<<itr->getAddress()<<"\t"<<itr->getPhone()<<"\t"<<(itr->getDob()).toString()<<"\t"<<itr->getPass()<<"\t"<<itr->getSalary()<<endl;
+    }
+    support.drawLine(100);
+    cout<<endl;
+}
+
+void Controller::deleteEmployee(){
+    Support support;
+    vector<Employee> empVector;
+    Employee emp;
+    fstream fin("employee.txt", ios::binary | ios::in);
+    while(fin.read((char*)&emp, sizeof(Employee))){
+        empVector.push_back(emp);
+    }
+    fin.close();
+    int id;
+    cout<<"Enter the Id of the Employee to be deleted";
+    cin>>id;
+    for(int i = 0 ; i < empVector.size() ; i++){
+        if(empVector[i].getID()== id){
+            empVector.erase(empVector.begin()+i);
+        }
+    }
+    //truncating the cust vector to employee.txt
+    fstream fout("employee.txt",ios::binary | ios::out | ios::trunc);
+    for(int i = 0; i < empVector.size() ; i++){
+        fout.write((char*)&empVector,sizeof(Employee));
+    }
+    fout.close();
+}
+
+void Controller::deposit(){
+    Support support;
+    vector<Customer>custVector;
+    Customer cust;
+    fstream fin("customer.txt",ios::binary | ios::in);
+    while(fin.read((char*)&cust, sizeof(Customer))){
+        custVector.push_back(cust);
+    }
+    fin.close();
+    support.drawLine(100);
+    cout<<"\e[3mDeposit Window\e[0m"<<endl;
+    support.drawLine(100);
+    int id;
+    float money;
+    cout<<"Enter the Id of the Customer"<<endl;
+    cin>>id;
+    cout<<"Enter the Amount to Deposit";
+    cin>>money;
+    bool SUCCESS = false;
+    for(vector<Customer>::iterator itr=custVector.begin();itr!=custVector.end();++itr)
+    {
+        if(itr->getID()==id)
+        {
+            itr->deposit(money);
+            SUCCESS=true;
+            break;
+        }
+    }
+    //WRITING CUST VECTOR TO THE CUSTOMER.TXT
+    fstream fout("customer.txt",ios::binary|ios::out|ios::trunc);
+    for(int i=0;i<custVector.size();i++)
+    {
+        fout.write((char*)&custVector.at(i),sizeof(Customer));
+    }
+    fout.close();
+    if(SUCCESS)
+    cout<<"Successfully deposited Rs."<<money<<endl;
+    else
+    cout<<"Transaction could not be completed. Please contact the nearest Branch."<<endl;
+}
+
+void Controller::withdraw(){
+    Support support;
+    vector<Customer> custVector;
+    Customer cust;
+    fstream fin("customer.txt", ios::binary | ios::in);
+    while(fin.read((char*)&cust, sizeof(Customer))){
+        custVector.push_back(cust);
+    }
+    fin.close();
+    support.drawLine(100);
+    cout<<"\e[3mWithdraw Window\e[0m";
+    int id;
+    float money;
+    cout<<"Enter the ID that you want the money to be withdrawn from ";
+    cin>>id;
+    cout<<"Enter the amount to withdraw ";
+    cin>>money;
+    bool SUCCESS=false;
+    for(vector<Customer>::iterator itr=custVector.begin();itr!=custVector.end();++itr)
+    {
+        if(itr->getID()==id)
+        {
+            itr->withdraw(money);
+            SUCCESS=true;
+            break;
+        }
+    }
+    //WRITING CUSTVECTOR TO THE CUSTOMER.TXT
+    fstream fout("customer.txt",ios::binary|ios::out|ios::trunc);
+    for(int i=0;i<custVector.size();i++)
+    {
+        fout.write((char*)&custVector.at(i),sizeof(Customer));
+    }
+    fout.close();
+    if(SUCCESS)
+    cout<<"Successfully withdrawn Rs."<<money<<::endl;
+    else
+    cout<<"Transaction could not be completed. Please contact the nearest Branch."<<endl;
+}
+
+
+
+//SORTING ALGORITHMS
+bool Controller::sortCustomerByName(const Customer& c1,const Customer& c2)
+{
+    if(strcmp(c1.getName(),c2.getName())<0)
+    return true;
+    else return false;
+}
+bool Controller::sortCustomerByDob(const Customer& c1,const Customer& c2)
+{
+    if(c1.getDob()<c2.getDob())
+    return true;
+    else return false;
+}
+bool Controller::sortCustomerById(const Customer& c1,const Customer& c2)
+{
+    if(c1.getID()<c2.getID())
+    return true;
+    else return false;
+}
+bool Controller::sortCustomerByBalance(const Customer& c1,const Customer& c2)
+{
+    if(c1.getBalance()<c2.getBalance())
+    return true;
+    else return false;
+}
+// Sorting End
